@@ -1,0 +1,33 @@
+﻿{% load static %}
+
+{% for obj in chat %}
+
+{% if obj.sender == request.user %}
+
+<div class="outgoing_msgs">
+    <div class="sent_msg">
+        <p class="bg-white mr-2 p-3 mb-1 rounded-3">{{ obj.message }} </p>
+        <span class="time_date"> {{ obj.created|timesince }} </span>
+    </div>
+  </div>
+
+{% else %}
+<div class="incoming_msg">
+    <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="Sender">
+    </div>
+    <div class="received_msg">
+      <div class="received_withd_msg">
+        <span class="time_date"> {{obj.sender.patient.name}}</span>
+        <p class="chat ml-2 p-3 rounded-3" style="background-color: #f5f6f7;">{{ obj.message }}</p>
+        <span class="time_date"> {{ obj.created|timesince }} </span>
+      </div>
+    </div>
+</div>
+
+{% endif %}
+{% empty %}
+<br><br>
+<li class="text-right list-group-item">No messages yet!</li>
+<br><br>
+
+{% endfor %}

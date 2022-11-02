@@ -1,0 +1,263 @@
+{% extends "basic.html" %}
+{% load static %}
+{% block custom_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tw-elements/dist/css/index.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
+{% block body %}
+<main id="main">
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Schedule History</h2>
+          <ol>
+              {% if request.user.patient.balance == "0.00" %}
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Create Appointment</button>
+              {% else %}
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#balanceModal">Create Appointment</button>
+              {% endif %}
+          </ol>
+          <!-- Modal -->
+          <div class="modal fade" id="balanceModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <h1 class="text-danger">You still have remaining balance</h1>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chosse a doctor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <table class="table table-hover table-bordered">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th>Name</th>
+                      <th>Specialization</th>
+                      <th>Consult</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+
+                   {% for i in dobj %}
+                    <tr>
+                      <td>{{i.full_name}}</td>
+                      <td>{{i.specialization}}</td>
+                      <td>
+                        <a href="{% url 'pview_schedule' i.user.id %}" class="btn btn-primary">Create</a>
+                      </td>
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+              <table class="table align-middle mb-0 bg-white">
+                  <thead class="bg-light">
+                    <tr>
+                      <th>Doctor</th>
+                      <th>Date/Time</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      {% for i in schedule %}
+                      <tr>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            {% if i.doctor.gender == "1" %}
+                              <img
+                                  src="https://bootdey.com/img/Content/avatar/avatar6.png"
+                                  alt=""
+                                  style="width: 45px; height: 45px"
+                                  class="rounded-circle"
+                                  />
+                              {% else %}
+                                <img
+                                    src="https://bootdey.com/img/Content/avatar/avatar8.png"
+                                    alt=""
+                                    style="width: 45px; height: 45px"
+                                    class="rounded-circle"
+                                    />
+                              {% endif %}
+                            <div class="ms-3">
+                              <a class="fw-bold mb-1" href="{% url 'pviewprofile' i.patient.user.username %}">{{i.doctor.full_name}}</a>
+
+                            </div>
+                          </div>
+                          </td>
+                        <td><p class="fw-normal mb-1">{{i.starting_time}}-{{i.ending_time|time}}</p></td>
+
+                        <td>
+                          {% if i.status == "1" %}
+
+                          {% elif i.status == "2"  %}
+                          <button type="button" onclick="accept_event({{i.id}})" class="btn btn-outline-secondary btn-sm">
+                            Accept
+                          </button>
+                          <button type="button" href="" onclick="get_event({{i.id}})" class="btn btn-outline-info btn-sm">
+                            Reschedule
+                          </button>
+                          {% elif i.status == "3" %}
+                            <span class="badge bg-info d-inline">Accepted</span>
+                          {% else %}
+                            <span class="badge bg-success d-inline">Done</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+                </table>
+        </div>
+      </div>
+
+      </div>
+      <div class="modal fade" id="rechedModal" tabindex="-1" aria-labelledby="rechedModal" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Add Schedule</h5>
+              <button type="button" data-bs-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" id="constid">
+              <div class="form-group col-md-12">
+                <div class="flex items-center justify-center">
+                  <div class="datepicker relative form-floating mb-3 xl:w-96">
+                    <input type="text" data-date-format='yyyy-mm-dd'
+                      id="date"
+                      class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                      placeholder="yyyy-mm-dd" />
+                    <label for="floatingInput" class="text-gray-700">Select a date</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-12">
+                <div class="flex justify-center">
+                  <div class="timepicker relative form-floating mb-3 xl:w-96">
+                    <input type="text" id="starting" class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                      placeholder="Select a date" />
+                    <label for="floatingInput" class="text-gray-700">Starting Time</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-12">
+                <div class="flex justify-center">
+                  <div class="timepicker relative form-floating mb-3 xl:w-96">
+
+                    <input type="text" id="ending" class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                      placeholder="Select a date" />
+                    <label for="floatingInput" class="text-gray-700">Ending Time</label>
+                    <button tabindex="0" type="button" class="timepicker-toggle-button" data-mdb-toggle="timepicker">
+                      <i class="fas fa-clock timepicker-icon"></i>
+                    </button>
+                    <p class="text-danger" id="endingError"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="save" class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script>
+  function get_event(id){
+    id = id;
+    $.ajax({
+      type:"POST",
+      url:"{% url 'get_event' %}",
+      data:{
+        id:id
+      },
+      dataType:"json",
+      success:function(response){
+        var data = JSON.parse(response);
+        $('#rechedModal').modal('show');
+        $('#constid').val(data.id);
+      }
+    })
+  }
+  $('#save').click(function(){
+    id = $('#constid').val();
+    var starting = $('#starting').val();
+    var ending = $('#ending').val();
+    var date = $('#date').val();
+    $.ajax({
+      type:"POST",
+      url:'{% url 'resched_event_patient' %}',
+      data:{
+        id:id,
+        starting:starting,
+        ending:ending,
+        date:date
+      },
+      dataType: "JSON",
+      success: function(response){
+        if(response.status == "success" ){
+          toastr.success(response.message)
+          setTimeout(function () {
+            location.reload(true);
+          }, 2000);
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  })
+  function accept_event(id){
+    id = id;
+    $.ajax({
+      type:"POST",
+      url:"{% url 'accept_event' %}",
+      data:{
+        id:id
+      },
+      dataType:"JSON",
+      success: function(response){
+        if(response.status == "success" ){
+          toastr.success(response.message)
+          setTimeout(function () {
+            location.reload(true);
+          }, 2000);
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

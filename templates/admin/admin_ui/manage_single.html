@@ -1,0 +1,213 @@
+{% extends "basic.html" %}
+{% load static %}
+
+{% block body %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Symptoms|{{symptoms_obj.symptoms_name}}</h2>
+          <ol>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add</button>
+          </ol>
+        </div>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Symptoms Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                        <input type="hidden" id="symp_id" name="" value="{{symptoms_obj.id}}">
+                         <label for="#q_body" class="form-label">Question Body *</label>
+                         <input type="text" id="q_body" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_q_body" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#q_body" class="form-label">Possible Cause *</label>
+                         <select class="form-select" id="possible" aria-label="Default select example">
+                           {% for p in possible_obj %}
+                            <option value="{{p.id}}">{{p.name}}</option>
+                           {% endfor %}
+                          </select>
+                         <div id="error_" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+
+                  <!-- Submit button -->
+                  <button type="button" id="save" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Symptoms Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                        <input type="hidden" id="symp_id" name="" value="{{symptoms_obj.id}}">
+                         <label for="#q_body" class="form-label">Question Body *</label>
+                         <input type="text" id="q_body" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_q_body" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+
+                  <!-- Submit button -->
+                  <button type="button" id="save" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table" id="tbl_patient">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Question Body</th>
+                      <th scope="col">Possible Cause</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                  </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+    load_question();
+  });
+  $('#save').click(function(){
+    if($.trim($('#q_body').val()).length == 0){
+        error_q_body = 'Field is required';
+        $('#error_q_body').text(error_q_body);
+      }
+      else{
+        error_q_body = '';
+        $('#error_q_body').text(error_q_body);
+      }
+
+      if (error_q_body != '') {
+       toastr.error("Correct error in the form")
+     }else{
+       var data = {
+         'body': $('#q_body').val(),
+         'id': $('#symp_id').val(),
+         'possible': $('#possible').val(),
+       }
+       $.ajax({
+         type: "POST",
+         url: "{% url 'add_question' %}",
+         data: data,
+         dataType: "JSON",
+         success:function(response){
+           if(response.status == "success" ){
+             $('#exampleModal').modal('hide');
+             toastr.success(response.message)
+             setTimeout(function () {
+               location.reload(true);
+             }, 2000);
+           }else if (response.status == "error") {
+             toastr.error(response.message)
+           }
+         },
+       });
+     }
+
+  });
+  function load_question(){
+    var data = {
+      'id': $('#symp_id').val(),
+    }
+    console.log(data)
+    $.ajax({
+  type:"POST",
+  url: "{% url 'get_question' %}",
+  data:data,
+  dataType: "json",
+  success: function(data){
+    var n = JSON.parse(data);
+    console.log(n);
+    $('#tbl_patient').DataTable({
+      "data": n,
+      "columns": [
+        { data: "id"},
+        { data: "q_body" },
+        { data: "possible" },
+        {data: "",
+        mRender:function(data, type, row){
+            return '<a type="button" class="btn btn-link btn-outline-info" class="btn btn-light"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a> <button type="button" onclick="question_delete('+row.id+')" class="btn btn-link"><i class="fa  fa-times" aria-hidden="true"></i></button>'
+        }}
+      ]
+  });
+  },
+  error: function(error){
+    console.log(error.responseText);
+  }
+});
+  }
+  function question_delete(id){
+    id = id;
+    $.ajax({
+      type: "POST",
+      url:"{% url 'delete_question' %}",
+      data:{
+        id:id,
+      },
+      dataType:"JSON",
+      success:function(response){
+        if(response.status == "success" ){
+          $('#tbl_patient').DataTable().destroy();
+          load_question();
+          toastr.success(response.message)
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  }
+
+</script>
+{% endblock %}

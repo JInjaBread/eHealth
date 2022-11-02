@@ -1,0 +1,264 @@
+{% extends "basic.html" %}
+{% load static %}
+
+{% block body %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Possible Cause|{{ possible_obj.name }}</h2>
+        </div>
+        <div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Possible Cause Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                        <input type="hidden" name="" id="pid" value="{{ possible_obj.id }}">
+                         <label for="#cause" class="form-label">Possible Cause *</label>
+                         <input type="text" id="cause" class="form-control" id="exampleInputEmail1" value="{{ possible_obj.name }}" aria-describedby="emailHelp">
+                         <div id="error_cause" class="form-text" ></div>
+                       </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#info" class="form-label">Information *</label>
+                         <textarea type="text" id="info" rows="4" cols="50" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">{{possible_obj.info}}</textarea>
+                         <div id="error_info" class="form-text" ></div>
+                       </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#self" class="form-label">Self Care *</label>
+                         <textarea type="text" id="self" rows="4" cols="50" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">{{ possible_obj.self_care }}</textarea>
+                         <div id="error_self" class="form-text" ></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+
+                  <!-- Submit button -->
+                  <button type="button" id="saveinfo" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="addvModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Video Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="{% url 'add_video' possible_obj.id%}" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#fname" class="form-label">File *</label>
+                         <input type="file" id="vid" name="vid" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" multiple />
+                         <div id="error_file" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+
+                  <!-- Submit button -->
+                  <button type="submit" id="save" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                  Possible Cause
+                 <button class="btn btn-link position-absolute top-0 end-0" type="button" data-bs-toggle="modal" data-bs-target="#modalEdit">Edit</button>
+              </div>
+              <div class="card-body">
+                <p class="text-success">Diagnosis</p>
+                <p>{{ possible_obj.name }}</p>
+                <p class="text-info">Information</p>
+                <p>{{ possible_obj.info }}</p>
+                <p class="text-danger">Self Care</p>
+                <p>{{ possible_obj.self_care }}</p>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                Video
+                  <button class="btn btn-link position-absolute top-0 end-0" type="button" data-bs-toggle="modal" data-bs-target="#addvModal">Add</button>
+              </div>
+
+              <div class="card-body">
+                <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Video File</th>
+                          <th scope="col">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for v in video_obj %}
+                        <tr>
+                          <td>{{v.id}}</td>
+                          <td><video width="320" height="240" controls>
+                            <source src="http://127.0.0.1:8000/media/{{ v.video_file }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                          </video></td>
+                          <td><button onclick="delete_video({{v.id}})" class="btn btn-link" type="button"><i class="fa fa-times" aria-hidden="true"></i></button></td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                      </table>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+      load_symp();
+  });
+  $('#saveinfo').click(function(){
+    if($.trim($('#cause').val()).length == 0){
+        error_cause = 'Field is required';
+        $('#error_cause').text(error_cause);
+      }
+      else{
+        error_cause = '';
+        $('#error_cause').text(error_cause);
+      }
+      if($.trim($('#info').val()).length == 0){
+          error_info = 'Field is required';
+          $('#error_info').text(error_info);
+      }
+      else{
+          error_info= '';
+          $('#error_info').text(error_info);
+      }
+      if($.trim($('#self').val()).length == 0){
+          error_self = 'Field is required';
+          $('#error_self').text(error_self);
+      }
+      else{
+          error_self = '';
+          $('#error_self').text(error_self);
+      }
+
+
+      if (error_cause != '' || error_info != '' || error_self != '') {
+       toastr.error("Correct error in the form")
+     }else{
+       var data = {
+         'id': $('#pid').val(),
+         'name': $('#cause').val(),
+         'info': $('#info').val(),
+         'self': $('#self').val(),
+       }
+       console.log(data)
+       $.ajax({
+         type: "POST",
+         url: "{% url 'update_possible_cause' %}",
+         data: data,
+         dataType: "JSON",
+         success:function(response){
+           if(response.status == "success" ){
+             $('#exampleModal').modal('hide');
+             toastr.success(response.message)
+             setTimeout(function () {
+               location.reload(true);
+             }, 2000);
+           }else if (response.status == "error") {
+             toastr.error(response.message)
+           }
+         },
+       });
+     }
+
+  });
+  function load_symp(){
+    $.ajax({
+  type:"GET",
+  url: "{% url 'get_symp' %}",
+  dataType: "json",
+  success: function(data){
+    var n = JSON.parse(data);
+    console.log(n);
+    $('#tbl_patient').DataTable({
+      "data": n,
+      "columns": [
+        { data: "id"},
+        { data: "symp_name" },
+        {data: "",
+        mRender:function(data, type, row){
+            return '<a type="button" href="manage_single/'+ row.id +'" class="btn btn-link btn-outline-info" class="btn btn-light"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a> <button type="button" onclick="symp_delete('+row.id+')" class="btn btn-link"><i class="fa  fa-times" aria-hidden="true"></i></button>'
+        }}
+      ]
+  });
+  },
+  error: function(error){
+    console.log(error.responseText);
+  }
+});
+  }
+  function delete_video(id){
+    id = id;
+    $.ajax({
+      type: "POST",
+      url:"{% url 'delete_video' %}",
+      data:{
+        id:id,
+      },
+      dataType:"JSON",
+      success:function(response){
+        if(response.status == "success" ){
+          toastr.success(response.message)
+          setTimeout(function () {
+            location.reload(true);
+          }, 2000);
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

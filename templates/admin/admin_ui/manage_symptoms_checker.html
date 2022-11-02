@@ -1,0 +1,159 @@
+{% extends "basic.html" %}
+{% load static %}
+
+{% block body %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Manage Doctor</h2>
+          <ol>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add</button>
+          </ol>
+        </div>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Symptoms Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#fname" class="form-label">Symptoms Name *</label>
+                         <input type="text" id="symp" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_symp" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+
+                  <!-- Submit button -->
+                  <button type="button" id="save" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table" id="tbl_patient">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Symptoms Name</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                  </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+      load_symp();
+  });
+  $('#save').click(function(){
+    if($.trim($('#symp').val()).length == 0){
+        error_symp = 'Field is required';
+        $('#error_symp').text(error_symp);
+      }
+      else{
+        error_symp = '';
+        $('#error_symp').text(error_symp);
+      }
+
+      if (error_symp != '') {
+       toastr.error("Correct error in the form")
+     }else{
+       var data = {
+         'symp': $('#symp').val(),
+       }
+       $.ajax({
+         type: "POST",
+         url: "{% url 'add_symp' %}",
+         data: data,
+         dataType: "JSON",
+         success:function(response){
+           if(response.status == "success" ){
+             $('#exampleModal').modal('hide');
+             toastr.success(response.message)
+             setTimeout(function () {
+               location.reload(true);
+             }, 2000);
+           }else if (response.status == "error") {
+             toastr.error(response.message)
+           }
+         },
+       });
+     }
+
+  });
+  function load_symp(){
+    $.ajax({
+  type:"GET",
+  url: "{% url 'get_symp' %}",
+  dataType: "json",
+  success: function(data){
+    var n = JSON.parse(data);
+    console.log(n);
+    $('#tbl_patient').DataTable({
+      "data": n,
+      "columns": [
+        { data: "id"},
+        { data: "symp_name" },
+        {data: "",
+        mRender:function(data, type, row){
+            return '<a type="button" href="manage_single/'+ row.id +'" class="btn btn-link btn-outline-info" class="btn btn-light"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a> <button type="button" onclick="symp_delete('+row.id+')" class="btn btn-link"><i class="fa  fa-times" aria-hidden="true"></i></button>'
+        }}
+      ]
+  });
+  },
+  error: function(error){
+    console.log(error.responseText);
+  }
+});
+  }
+  function symp_delete(id){
+    id = id;
+    $.ajax({
+      type: "POST",
+      url:"{% url 'delete_symp' %}",
+      data:{
+        id:id,
+      },
+      dataType:"JSON",
+      success:function(response){
+        if(response.status == "success" ){
+          $('#tbl_patient').DataTable().destroy();
+          load_symp();
+          toastr.success(response.message)
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "basic.html" %}
+{% load static %}
+
+{% block body %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Manage Possible Cause</h2>
+          <ol>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add</button>
+          </ol>
+        </div>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Possible Cause Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#cause" class="form-label">Possible Cause *</label>
+                         <input type="text" id="cause" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_cause" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#info" class="form-label">Information *</label>
+                         <textarea type="text" id="info" rows="4" cols="50" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"></textarea>
+                         <div id="error_info" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#self" class="form-label">Self Care *</label>
+                         <textarea type="text" id="self" rows="4" cols="50" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"></textarea>
+                         <div id="error_self" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+
+                  <!-- Submit button -->
+                  <button type="button" id="save" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table" id="tbl_patient">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                  </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+      load_possible();
+  });
+  $('#save').click(function(){
+    if($.trim($('#cause').val()).length == 0){
+        error_cause = 'Field is required';
+        $('#error_cause').text(error_cause);
+      }
+      else{
+        error_cause = '';
+        $('#error_cause').text(error_cause);
+      }
+      if($.trim($('#info').val()).length == 0){
+          error_info = 'Field is required';
+          $('#error_info').text(error_info);
+      }
+      else{
+          error_info= '';
+          $('#error_info').text(error_info);
+      }
+      if($.trim($('#self').val()).length == 0){
+          error_self = 'Field is required';
+          $('#error_self').text(error_self);
+      }
+      else{
+          error_self = '';
+          $('#error_self').text(error_self);
+      }
+
+
+      if (error_cause != '' || error_info != '' || error_self != '') {
+       toastr.error("Correct error in the form")
+     }else{
+       var data = {
+         'name': $('#cause').val(),
+         'info': $('#info').val(),
+         'self': $('#self').val(),
+       }
+       console.log(data)
+       $.ajax({
+         type: "POST",
+         url: "{% url 'add_possible_cause' %}",
+         data: data,
+         dataType: "JSON",
+         success:function(response){
+           if(response.status == "success" ){
+             $('#exampleModal').modal('hide');
+             toastr.success(response.message)
+             setTimeout(function () {
+               location.reload(true);
+             }, 2000);
+           }else if (response.status == "error") {
+             toastr.error(response.message)
+           }
+         },
+       });
+     }
+
+  });
+  function load_possible(){
+    $.ajax({
+  type:"GET",
+  url: "{% url 'get_possible_cause' %}",
+  dataType: "json",
+  success: function(data){
+    var n = JSON.parse(data);
+    console.log(n);
+    $('#tbl_patient').DataTable({
+      "data": n,
+      "columns": [
+        { data: "id"},
+        { data: "name" },
+        {data: "",
+        mRender:function(data, type, row){
+            return '<a type="button" href="manage_single_cause/'+ row.id +'" class="btn btn-link btn-outline-info" class="btn btn-light"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a> <button type="button" onclick="possible_delete('+row.id+')" class="btn btn-link"><i class="fa  fa-times" aria-hidden="true"></i></button>'
+        }}
+      ]
+  });
+  },
+  error: function(error){
+    console.log(error.responseText);
+  }
+});
+  }
+  function possible_delete(id){
+    id = id;
+    $.ajax({
+      type: "POST",
+      url:"{% url 'delete_possible' %}",
+      data:{
+        id:id,
+      },
+      dataType:"JSON",
+      success:function(response){
+        if(response.status == "success" ){
+          $('#tbl_patient').DataTable().destroy();
+          load_possible();
+          toastr.success(response.message)
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "basic.html" %}
+{% load static %}
+
+{% block body %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          {% if request.user.is_superuser == True %}
+            <h2>Preview Symptoms Checker</h2>
+          {% else %}
+            <h2>Symptoms Checker</h2>
+          {% endif %}
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <h1 class="text-success">Step 1</h1>
+                <div class="list-group">
+                  {% for s in symptoms_obj %}
+                  <a type="button" class="list-group-item list-group-item-action" onclick="load_question({{s.id}})" aria-current="true">
+                    {{s.symptoms_name}}
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <h1 class="text-success">Step 2</h1>
+                <div class="row question">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <h1 class="text-success">Diagnosis</h1>
+                <div id="diagnosis">
+                  <p id="name"></p>
+                  <p class="text-info" id="infobdage"></p>
+                  <p id="info"></p>
+                  <p class="text-danger" id="selfbadge"></p>
+                  <p id="self"></p>
+                </div>
+                <div class="video">
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  function load_question(id){
+    id=id
+  $.ajax({
+    type:"POST",
+    url: "{% url 'get_question' %}",
+    data:{
+      'id':id
+    },
+    dataType: "json",
+    success: function(data){
+      $('.question').html('');
+      $.each(JSON.parse(data), function(key, value){
+        $('.question').append('<div class="col-md-12">\
+          <div class="card">\
+            <div class="card-body">\
+              <p>'+ value['q_body'] +'</p>\
+            <\div>\
+            <div class="card-footer">\
+              <button type="button" class="btn btn-primary" onclick="get_diagnosis('+ value['possible_id'] +')">Yes</button>\
+              <button type="button" class="btn btn-danger" name="button">No</button>\
+            <\div>\
+          </div>\
+        </div>');
+      });
+  },
+  error: function(error){
+    console.log(error.responseText);
+  }
+});
+  }
+  function get_diagnosis(id){
+
+    id=id
+  $.ajax({
+    type:"POST",
+    url: "{% url 'get_diagnosis' %}",
+    data:{
+      'id':id
+    },
+    dataType: "json",
+    success: function(data){
+      p = JSON.parse(data);
+      $('#name').html(p[0].name);
+      $('#infobdage').html('Information');
+      $('#info').html(p[0].info);
+      $('#selfbadge').html('Self Care');
+      $('#self').html(p[0].self_care);
+      $('.video').html('');
+      $.each(p, function(key, value){
+        if(value['url'] != undefined){
+          $('.video').append('<video width="320" height="240" controls>\
+            <source src="'+ value['url'] +'" type="video/mp4">\
+            Your browser does not support the video tag.\
+          </video>');
+        }
+      });
+    }
+  });
+  }
+</script>
+{% endblock %}

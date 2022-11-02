@@ -1,0 +1,313 @@
+{% extends "basic.html" %}
+{% load static %}
+
+{% block body %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Manage Patient</h2>
+          <ol>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Patient</button>
+          </ol>
+        </div>
+        <div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Patient Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#fname" class="form-label">First Name *</label>
+                         <input type="text" id="fname" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_fname" class="form-text"></div>
+                       </div>
+                    </div>
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#lname" class="form-label">Last Name *</label>
+                         <input type="text" id="lname" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_lname" class="form-text"></div>
+                       </div>
+                    </div>
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#mname" class="form-label">Middle Name</label>
+                         <input type="text" id="mname" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_mname" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#birthday" class="form-label">Birthday *</label>
+                         <div class="input-group date birthday" id="datepicker">
+                            <input type="text" class="form-control" id="date"/>
+                            <span class="input-group-append">
+                              <span class="input-group-text bg-light d-block">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+                            </span>
+                          </div>
+                          <div id="error_birthday" class="form-text"></div>
+                       </div>
+                    </div>
+                    <div class="col">
+                      <label for="#gender" class="form-label">Gender *</label>
+                      <select class="form-select" id="gender" aria-label="Default select example">
+                        <option value="Male" selected>Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+                    <div class="col">
+                      <label for="#gender" class="form-label">Civil Status *</label>
+                      <select class="form-select" id="civilstatus" aria-label="Default select example">
+                        <option value="Single" selected>Single</option>
+                        <option value="Maried">Maried</option>
+                        <option value="Widowed">Widowed</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#address" class="form-label">Address *</label>
+                         <input type="text" id="address" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_address" class="form-text"></div>
+                       </div>
+                    </div>
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#birth_place" class="form-label">Birth Place *</label>
+                         <input type="text" id="birth_place" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_birth_place" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Text input -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#guardian" class="form-label">Guardian(if patient is a child)</label>
+                         <input type="text" id="guardian" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                       </div>
+                    </div>
+                    <div class="col">
+                      <div class="mb-3">
+                         <label for="#contact" class="form-label">Contact Number</label>
+                         <input type="text" id="contact" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                         <div id="error_contact" class="form-text"></div>
+                       </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                         <label for="#guardian_two" class="form-label">Guardian(if patient cant communicate)</label>
+                         <input type="text" id="guardian_two" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Submit button -->
+                  <button type="button" id="save" class="btn btn-primary btn-block mb-4">Save Information</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table" id="tbl_patient">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">First Name</th>
+                      <th scope="col">Middle Name</th>
+                      <th scope="col">Last Name</th>
+                      <th scope="col">DOB</th>
+                      <th scope="col">Gender</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                  </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+      $('#datepicker').datepicker();
+      load_patient();
+  });
+
+  function load_patient(){
+    $.ajax({
+  type:"GET",
+  url: "{% url 'get_patient' %}",
+  dataType: "json",
+  success: function(data){
+    var n = JSON.parse(data);
+    console.log(n);
+    $('#tbl_patient').DataTable({
+      "data": n,
+      "columns": [
+        { data: "id"},
+        { data: "fname" },
+        { data: "mname" },
+        { data: "lname" },
+        { data: "dob" },
+        { data: "gender" },
+        {data: "",
+        mRender:function(data, type, row){
+            return '<a type="button" href="pviewprofile/'+row.username+'" class="btn btn-link btn-outline-info" class="btn btn-light"><i class="fa fa-eye" aria-hidden="true"></i></a> <button type="button" onclick="patient_delete('+row.id+')" class="btn btn-light"><i class="fa  fa-times" aria-hidden="true"></i></button>'
+        }}
+      ]
+  });
+  },
+  error: function(error){
+    console.log(error.responseText);
+  }
+});
+  }
+
+
+  $('#save').click(function(){
+    if($.trim($('#fname').val()).length == 0){
+        error_fname = 'First Name is required';
+        $('#error_fname').text(error_fname);
+      }
+      else{
+        error_fname = '';
+        $('#error_fname').text(error_fname);
+      }
+      if($.trim($('#lname').val()).length == 0){
+          error_lname = 'Last Name is required';
+          $('#error_lname').text(error_lname);
+      }
+      else{
+          error_lname = '';
+          $('#error_lname').text(error_lname);
+      }
+      if($.trim($('#date').val()).length == 0){
+          error_birthday = 'Birthday is required';
+          $('#error_birthday').text(error_birthday);
+      }
+      else{
+          error_birthday = '';
+          $('#error_birthday').text(error_birthday);
+      }
+      if($.trim($('#address').val()).length == 0){
+          error_address = 'Address is required';
+          $('#error_address').text(error_address);
+      }
+      else{
+          error_address = '';
+          $('#error_address').text(error_address);
+      }
+      if($.trim($('#birth_place').val()).length == 0){
+          error_birth_place = 'Birth Place is required';
+          $('#error_birth_place').text(error_birth_place);
+      }
+      else{
+          error_birth_place= '';
+          $('#error_birth_place').text(error_birth_place);
+      }
+      if($.trim($('#contact').val()).length == 0){
+          error_contact = '';
+          $('#error_contact').text(error_contact);
+      }
+      else if($.isNumeric($('#contact').val()) == false){
+          error_contact= 'This must be a number!';
+          $('#error_contact').text(error_contact);
+      }else{
+        error_contact = '';
+        $('#error_contact').text(error_contact);
+      }
+      if (error_fname != '' || error_lname != '' || error_birthday != '' || error_address != '' || error_birth_place != '' || error_contact != '' ) {
+       toastr.error("Correct error in the form")
+     }else{
+       var data = {
+         'fname': $('#fname').val(),
+         'lname': $('#lname').val(),
+         'mname': $('#mname').val(),
+         'lname': $('#lname').val(),
+         'birthday': $('#date').val(),
+         'gender': $('#gender').val(),
+         'civilstatus': $('#civilstatus').val(),
+         'address': $('#address').val(),
+         'birth_place': $('#birth_place').val(),
+         'guardian': $('#guardian').val(),
+         'contact': $('#contact').val(),
+         'guardian_two': $('#guardian_two').val(),
+
+
+       }
+       $.ajax({
+         type: "POST",
+         url: "{% url 'add_patient' %}",
+         data: data,
+         dataType: "JSON",
+         success:function(response){
+           if(response.status == "success" ){
+             $('#exampleModal').modal('hide');
+             toastr.success(response.message)
+             setTimeout(function () {
+               location.reload(true);
+             }, 2000);
+           }else if (response.status == "error") {
+             toastr.error(response.message)
+           }
+         },
+       });
+     }
+
+  });
+  function patient_delete(id){
+    id = id;
+    $.ajax({
+      type: "POST",
+      url:"{% url 'delete_patient' %}",
+      data:{
+        id:id,
+      },
+      dataType:"JSON",
+      success:function(response){
+        if(response.status == "success" ){
+          $('#tbl_patient').DataTable().destroy();
+          load_patient();
+          toastr.success(response.message)
+        }else if (response.status == "error") {
+          toastr.error(response.message)
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

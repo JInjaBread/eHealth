@@ -1,0 +1,455 @@
+{% extends "basic.html" %}
+{% load static %}
+{% block body %}
+<main id="main">
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Patient Information</h2>
+          {% if request.user.is_superuser == True %}
+          <ol>
+            <li>
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePassword">Update Password</button>
+            </li>
+            <li>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updateBalance">Update Balance</button></li>
+          </ol>
+          <!-- Modal -->
+          <div class="modal fade" id="changePassword" tabindex="-1" aria-labelledby="changePassword" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Update Password</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" id="userid" value="{{ puser.id }}">
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password">
+                    <div id="error_password" class="text-danger"></div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" id="updatePass">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="updateBalance" tabindex="-1" aria-labelledby="changePassword" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Update Balance</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" id="userid" value="{{ puser.id }}">
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Balance</label>
+                    <input type="text" class="form-control" id="balance">
+                    <div id="error_balance" class="text-danger"></div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" id="updateBal">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <ol>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePassword">Update Password</button>
+          </ol>
+          <div class="modal fade" id="changePassword" tabindex="-1" aria-labelledby="changePassword" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Update Password</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" id="userid" value="{{ puser.id }}">
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password">
+                    <div id="error_password" class="text-danger"></div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" id="updatePass">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Edit Profile</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="row justify-content-center align-items-center h-100">
+                    <div class="col col-lg-6 mb-4 mb-lg-0">
+                      <div class="card mb-3" style="border-radius: .5rem;">
+                        <div class="row g-0">
+                          <div class="col-md-4 gradient-custom text-center text-white"
+                            style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                              {% if puser.patient.gender == "Male" %}
+                              <img src="https://bootdey.com/img/Content/avatar/avatar6.png"
+                                alt="Avatar" class="img-fluid my-5 rounded-circle" style="width: 80px;" />
+                              {% else %}
+                              <img src="https://bootdey.com/img/Content/avatar/avatar8.png"
+                                alt="Avatar" class="img-fluid my-5 rounded-circle" style="width: 80px;" />
+                              {% endif %}
+                            <i class="far fa-edit mb-5"></i>
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body p-4">
+                              <h6>Information</h6>
+                              <hr class="mt-0 mb-4">
+                              <div class="row pt-1">
+                                <input class="form-control" id="userid" value="{{ request.user.id }}" hidden>
+                                <div class="col mb-3">
+                                  <h6>First Name</h6>
+                                  <input class="form-control" id="fname" value="{{puser.patient.first_name}}">
+                                  <div id="error_fname" class="form-text"></div>
+                                </div>
+                              </div>
+                              <div class="row pt-1">
+                                <div class="col mb-3">
+                                  <h6>Middle Name</h6>
+                                  <input class="form-control" id="mname" value="{{puser.patient.middle_name}}">
+                                </div>
+                              </div>
+                              <div class="row pt-1">
+                                <div class="col mb-3">
+                                  <h6>Last Name</h6>
+                                  <input class="form-control" id="lname" value="{{puser.patient.last_name}}">
+                                  <div id="error_lname" class="form-text"></div>
+                                </div>
+                              </div>
+                              <div class="row pt-1">
+                                <div class="col mb-3">
+                                  <h6>Address</h6>
+                                  <input class="form-control" id="address" value="{{puser.patient.address}}">
+                                </div>
+                              </div>
+                              <div class="row pt-1">
+                                <div class="col mb-3">
+                                  <h6>Phone</h6>
+                                  <input class="form-control" id="contact" value="{{puser.patient.contact_number}}">
+                                  <div id="error_contact" class="form-text"></div>
+                                </div>
+                              </div>
+                              <div class="row pt-1">
+                                <div class="col mb-3">
+                                  <h6>Email</h6>
+                                  <input class="form-control" id="email" value="{{puser.email}}">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" id="save" class="btn btn-primary">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+        </div>
+
+      </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page">
+      <div class="container">
+					    <div class="row justify-content-center align-items-center h-100">
+					      <div class="col col-lg-6 mb-4 mb-lg-0">
+					        <div class="card mb-3" style="border-radius: .5rem;">
+					          <div class="row g-0">
+					            <div class="col-md-4 gradient-custom text-center text-white"
+					              style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                          {% if puser.patient.gender == "Male" %}
+                          <img src="https://bootdey.com/img/Content/avatar/avatar6.png"
+                            alt="Avatar" class="img-fluid my-5 rounded-circle" style="width: 80px;" />
+                          {% else %}
+                          <img src="https://bootdey.com/img/Content/avatar/avatar8.png"
+                            alt="Avatar" class="img-fluid my-5 rounded-circle" style="width: 80px;" />
+                          {% endif %}
+													{% if request.user.patient %}
+                            <div class="container mt-3 mb-3 ml-4 mr-4">
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-primary pr-4 pl-4 mr-5 ml-5" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
+                              </div>
+                            </div>
+													{% endif %}
+					              <i class="far fa-edit mb-5"></i>
+					            </div>
+					            <div class="col-md-8">
+					              <div class="card-body p-4">
+					                <h6>Information</h6>
+					                <hr class="mt-0 mb-4">
+					                <div class="row pt-1">
+					                  <div class="col-6 mb-3">
+					                    <h6>Full Name</h6>
+					                    <p class="text-muted">{{puser.patient.full_name}}</p>
+					                  </div>
+					                  <div class="col-6 mb-3">
+					                    <h6>Gender</h6>
+					                    <p class="text-muted">{{puser.patient.gender}}</p>
+					                  </div>
+					                </div>
+													<div class="row pt-1">
+					                  {% if request.user.patient or request.user.is_superuser == True %}
+                            <div class="col-6 mb-3">
+					                    <h6>User Name</h6>
+					                    <p class="text-muted">{{ puser.username }}</p>
+					                  </div>
+                            {% endif %}
+					                  <div class="col-6 mb-3">
+					                    <h6>Email</h6>
+					                    <p class="text-muted">{{puser.email}}</p>
+					                  </div>
+					                </div>
+					                <div class="row pt-1">
+					                  <div class="col-6 mb-3">
+					                    <h6>Address</h6>
+					                    <p class="text-muted">{{ puser.patient.address }}</p>
+					                  </div>
+					                  <div class="col-6 mb-3">
+					                    <h6>Phone</h6>
+					                    <p class="text-muted">{{puser.patient.contact_number}}</p>
+					                  </div>
+					                </div>
+					                <h6>Others</h6>
+					                <hr class="mt-0 mb-4">
+					                <div class="row pt-1">
+					                  <div class="col-6 mb-3">
+					                    <h6>Recent Consultion</h6>
+					                    <p class="text-muted"></p>
+					                  </div>
+					                  <div class="col-6 mb-3">
+					                    <h6>Balance</h6>
+					                    <p class="text-muted">{{puser.patient.balance}}</p>
+					                  </div>
+					                </div>
+					              </div>
+					            </div>
+					          </div>
+					        </div>
+    </section>
+
+  </main><!-- End #main -->
+
+{% endblock %}
+{% block custom_js %}
+{% if request.user.is_superuser == True %}
+<script>
+  $('#updatePass').click( function(event){
+    id = $('#userid').val()
+    password = $('#password').val()
+
+    if($.trim($('#password').val()).length == 0){
+        error_password = 'Field is required';
+        $('#error_password').text(error_password);
+      }
+    else{
+        error_password = '';
+        $('#error_password').text(error_password);
+    }
+    if(error_password != ""){
+      toastr.error("Correct error in form!")
+    }else{
+      $.ajax({
+          url :"{% url 'update_password' %}",
+          type : "POST",
+          data : {
+            'id': id,
+            'password': password
+          },
+          dataType: "JSON",
+          success : function(response){
+            if(response.status == "success" ){
+              $('#changePassword').modal('hide');
+              toastr.success(response.message)
+              setTimeout(function () {
+                location.reload(true);
+              }, 2000);
+            }else if (response.status == "error") {
+              toastr.error(response.message)
+            }
+          }
+
+      });
+    }
+  });
+</script>
+<script>
+  $('#updateBal').click( function(event){
+    id = $('#userid').val()
+    balance = $('#balance').val()
+
+    if($.trim($('#balance').val()).length == 0){
+        error_balance = 'This is required';
+        $('#error_balance').text(error_balance);
+    }
+    else if($.isNumeric($('#balance').val()) == false){
+        error_balance= 'This must be a number!';
+        $('#error_balance').text(error_balance);
+    }else{
+      error_balance = '';
+      $('#error_balance').text(error_balance);
+    }
+    if(error_balance != ""){
+      toastr.error("Correct error in form!")
+    }else{
+      $.ajax({
+          url :"{% url 'update_balance' %}",
+          type : "POST",
+          data : {
+            'id': id,
+            'balance': balance
+          },
+          dataType: "JSON",
+          success : function(response){
+            if(response.status == "success" ){
+              $('#changePassword').modal('hide');
+              toastr.success(response.message)
+              setTimeout(function () {
+                location.reload(true);
+              }, 2000);
+            }else if (response.status == "error") {
+              toastr.error(response.message)
+            }
+          }
+
+      });
+    }
+  });
+
+</script>
+{% else %}
+<script>
+  $('#updatePass').click( function(event){
+    id = $('#userid').val()
+    password = $('#password').val()
+
+    if($.trim($('#password').val()).length == 0){
+        error_password = 'Field is required';
+        $('#error_password').text(error_password);
+      }
+    else{
+        error_password = '';
+        $('#error_password').text(error_password);
+    }
+    if(error_password != ""){
+      toastr.error("Correct error in form!")
+    }else{
+      $.ajax({
+          url :"{% url 'update_password' %}",
+          type : "POST",
+          data : {
+            'id': id,
+            'password': password
+          },
+          dataType: "JSON",
+          success : function(response){
+            if(response.status == "success" ){
+              $('#changePassword').modal('hide');
+              toastr.success(response.message)
+              setTimeout(function () {
+                location.href = "{% url 'home' %}";
+              }, 2000);
+            }else if (response.status == "error") {
+              toastr.error(response.message)
+            }
+          }
+
+      });
+    }
+  });
+</script>
+{% endif %}
+<script>
+  $('#save').click(function(){
+    if($.trim($('#fname').val()).length == 0){
+        error_fname = 'First Name is required';
+        $('#error_fname').text(error_fname);
+      }
+      else{
+        error_fname = '';
+        $('#error_fname').text(error_fname);
+      }
+      if($.trim($('#lname').val()).length == 0){
+          error_lname = 'Last Name is required';
+          $('#error_lname').text(error_lname);
+      }
+      else{
+          error_lname = '';
+          $('#error_lname').text(error_lname);
+      }
+      if($.trim($('#address').val()).length == 0){
+          error_address = 'Address is required';
+          $('#error_address').text(error_address);
+      }
+      else{
+          error_address = '';
+          $('#error_address').text(error_address);
+      }
+      if($.trim($('#contact').val()).length == 0){
+          error_contact = '';
+          $('#error_contact').text(error_contact);
+      }
+      else if($.isNumeric($('#contact').val()) == false){
+          error_contact= 'This must be a number!';
+          $('#error_contact').text(error_contact);
+      }else{
+        error_contact = '';
+        $('#error_contact').text(error_contact);
+      }
+
+      if (error_fname != '' || error_lname != '' || error_address != '' || error_contact != ''  ) {
+       toastr.error("Correct error in the form")
+     }else{
+       var data = {
+         'id': $('#userid').val(),
+         'fname': $('#fname').val(),
+         'lname': $('#lname').val(),
+         'mname': $('#mname').val(),
+         'lname': $('#lname').val(),
+         'address': $('#address').val(),
+         'contact': $('#contact').val(),
+         'email': $('#email').val(),
+       }
+       $.ajax({
+         type: "POST",
+         url: "{% url 'edit_profile_patient' %}",
+         data: data,
+         dataType: "JSON",
+         success:function(response){
+           if(response.status == "success" ){
+             $('#exampleModal').modal('hide');
+             toastr.success(response.message)
+             setTimeout(function () {
+               location.reload(true);
+             }, 2000);
+           }else if (response.status == "error") {
+             toastr.error(response.message)
+           }
+         },
+       });
+     }
+
+  });
+</script>
+
+{% endblock %}
